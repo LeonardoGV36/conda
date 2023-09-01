@@ -16,13 +16,14 @@ from inspect import getmodule, isclass
 from typing import Literal, overload
 
 import pluggy
+from requests.adapters import BaseAdapter
 from requests.auth import AuthBase
 
 from ..auxlib.ish import dals
 from ..base.context import context
 from ..core.solve import Solver
 from ..exceptions import CondaValueError, PluginError
-from . import solvers, subcommands, virtual_packages
+from . import solvers, subcommands, transport_adapters, virtual_packages
 from .hookspec import CondaSpecs, spec_name
 from .subcommands.doctor import health_checks
 from .types import (
@@ -32,6 +33,7 @@ from .types import (
     CondaPreCommand,
     CondaSolver,
     CondaSubcommand,
+    CondaTransportAdapter,
     CondaVirtualPackage,
 )
 
@@ -308,6 +310,12 @@ class CondaPluginManager(pluggy.PluginManager):
             for subcommand in self.get_hook_results("subcommands")
         }
 
+    def get_transport_adapters(self) -> dict[str, CondaTransportAdapter]:
+        return {
+            transport_adapter.name.lower(): transport_adapter
+            for transport_adapter in self.get_hook_results("transport_adapters")
+        }
+
     def get_virtual_packages(self) -> tuple[CondaVirtualPackage, ...]:
         return tuple(self.get_hook_results("virtual_packages"))
 
@@ -332,6 +340,7 @@ def get_plugin_manager() -> CondaPluginManager:
         solvers,
         *virtual_packages.plugins,
         *subcommands.plugins,
+        *transport_adapters.plugins,
         health_checks,
     )
     plugin_manager.load_entrypoints(spec_name)
