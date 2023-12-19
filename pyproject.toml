@@ -26,7 +26,7 @@ dependencies = [
   "archspec",
   "boltons >=23.0.0",
   "charset-normalizer",
-  "conda-libmamba-solver >=23.11.0",
+  # "conda-libmamba-solver >=23.11.0",
   "conda-package-handling >=2.2.0",
   "distro >=1.5.0",
   "jsonpatch >=1.32",
