@@ -3183,6 +3183,9 @@ def test_conda_list_json():
 @pytest.mark.skipif(
     context.subdir == "win-32", reason="dependencies not available for win-32"
 )
+@pytest.mark.skipif(
+    sys.version_info[:2] > (3, 11), reason="dependencies not available for Python 3.12"
+)
 def test_legacy_repodata():
     channel = join(dirname(abspath(__file__)), "data", "legacy_repodata")
     subdir = context.subdir
